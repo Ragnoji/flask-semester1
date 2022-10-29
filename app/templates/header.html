@@ -1,0 +1,22 @@
+{% load static %}
+<header>
+    <div class="container">
+        <div class="upper-block">
+            <a href="/" class="logo">Shop</a>
+            <form action="" class="search-form">
+                <input type="search" placeholder="Поиск товаров">
+                <input type="submit" value="" class="search">
+            </form>
+            <button class="help">Помощь</button>
+            <a href="{% url 'cart:cart_detail' %}" class="to-cart"><img src="{% static 'img/cart.svg' %}" class="cart">
+                <div class="products-in-cart"
+                     {% if cart == 0 %}
+                     style="display: none"
+                     {% endif %}>{{ cart }}</div>
+                Корзина</a>
+            {% if user.username != '' %}
+            <a class="sign-in" href="/logout"><img src="{% static 'img/person.svg' %}" class="person"><div><p>{{ user.get_initials }}</p><span class="balance">Баланс: {{ user.balance }}</span></div></a>
+            {% else %}
+            <a class="sign-in" onclick="sign_in()"><img src="{% static 'img/person.svg' %}" class="person">Войти</a>
+            {% endif %}
+        </div>

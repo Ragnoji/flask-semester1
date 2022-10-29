@@ -1,26 +1,64 @@
-import functools
+from datetime import datetime
+from datetime import timezone
+from datetime import timedelta
 
 from flask import (
-    Blueprint, current_app, flash, g, redirect, render_template, request,
-    session, url_for
+    Blueprint, current_app, flash, redirect, render_template, request,
+    session, url_for, make_response, g
 )
+from flask_jwt_extended import (JWTManager, create_access_token, create_refresh_token, jwt_required, get_jwt_identity,
+                                set_access_cookies, set_refresh_cookies, current_user, get_jwt, verify_jwt_in_request)
+from flask_jwt_extended.exceptions import NoAuthorizationError, RevokedTokenError
+from jwt.exceptions import ExpiredSignatureError
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.db import get_db
 
-
-bp = Blueprint('auth', __name__, url_prefix='/auth')
+jwt = JWTManager(current_app)
+bp = Blueprint('auth', __name__)
 
 @bp.before_app_request
 def load_logged_in_user():
-    user_id = session.get('user_id')
+    try:
+        verify_jwt_in_request()
+        g.user = current_user
+    except NoAuthorizationError:
+        pass
+    except ExpiredSignatureError:
+        return redirect(url_for('auth.refresh_expiring_jwts'))
+    except RevokedTokenError:
+        resp = make_response(redirect(url_for('auth.login')))
+        resp.delete_cookie('csrf_token')
+        resp.delete_cookie('csrf_refresh_token')
+        resp.delete_cookie('csrf_access_token')
+        resp.delete_cookie('refresh_token_cookie')
+        resp.delete_cookie('access_token_cookie')
+        return resp
 
-    if user_id is None:
-        g.user = None
-    else:
-        db, cur = get_db()
-        cur.execute('SELECT * FROM usr WHERE id = (%s);', (user_id,))
-        g.user = cur.fetchone()
+@bp.route('/refresh')
+@jwt_required(refresh=True)
+def refresh_expiring_jwts(response):
+    try:
+        exp_timestamp = get_jwt()["exp"]
+        now = datetime.now(timezone.utc)
+        target_timestamp = datetime.timestamp(now + timedelta(minutes=30))
+        if target_timestamp > exp_timestamp:
+            access_token = create_access_token(identity=get_jwt()['sub'])
+            set_access_cookies(response, access_token)
+        return response
+    except (RuntimeError, KeyError):
+        # Case where there is not a valid JWT. Just return the original response
+        print(2)
+        return response
+
+
+@jwt.user_lookup_loader
+def user_lookup_callback(_jwt_header, jwt_data):
+    identity = jwt_data["sub"]
+    db, cur = get_db()
+    cur.execute('SELECT * FROM usr WHERE username = (%s);', (identity,))
+    return cur.fetchone()
+
 
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
@@ -52,6 +90,7 @@ def register():
         flash(error)
     return render_template('auth/register.html')
 
+
 @bp.route('/login', methods=('GET', 'POST'))
 def login():
     if request.method == 'POST':
@@ -69,33 +108,59 @@ def login():
             error = 'Incorrect password.'
 
         if error is None:
-            session.clear()
-            session['user_id'] = user['id']
+            access_token = create_access_token(identity=username)
+            refresh_token = create_refresh_token(identity=username)
+
+            resp = make_response(redirect(url_for('auth.login')))
+            set_access_cookies(resp, access_token)
+            set_refresh_cookies(resp, refresh_token)
             current_app.logger.info(
                 "User %s (%s) has logged in.", user['username'], user['id']
             )
-            return redirect(url_for('index'))
+            return resp
 
         current_app.logger.error(error)
         flash(error)
 
-    return render_template('auth/login.html')
+    context = {}
+    try:
+        verify_jwt_in_request()
+        context['csrf_token'] = get_jwt().get("csrf")
+    except NoAuthorizationError:
+        pass
+    return render_template('auth/login.html', **context)
 
 
-@bp.route('/logout')
+@jwt.token_in_blocklist_loader
+def check_if_token_revoked(jwt_header, jwt_payload: dict) -> bool:
+    jti = jwt_payload["jti"]
+    db, cur = get_db()
+    cur.execute('SELECT * from blocked_jwt WHERE jti = (%s);', (jti,))
+
+    return cur.fetchone() is not None
+
+
+@bp.route('/logout', methods=["POST"])
+@jwt_required()
 def logout():
-    if g.user is not None:
-        current_app.logger.info(
-            "User %s (%s) has signed out.", g.user['username'], g.user['id']
-        )
-    session.clear()
-    return redirect(url_for('index'))
+    jti = get_jwt()["jti"]
+    now = datetime.now(timezone.utc)
 
+    db, cur = get_db()
+    cur.execute('SELECT id FROM blocked_jwt WHERE jti = (%s);', (jti,))
+    if cur.fetchone() is not None:
+        return redirect(url_for('auth.login'))
 
-def login_required(view):
-    @functools.wraps(view)
-    def wrapped_view(**kwargs):
-        if g.user is None:
-            return redirect(url_for('auth.login'))
-        return view(**kwargs)
-    return wrapped_view
+    cur.execute(
+        'INSERT INTO blocked_jwt (jti, created_at) VALUES (%s, %s);',
+        (jti, now)
+    )
+    db.commit()
+    current_app.logger.info("Token has been added to block list")
+    resp = make_response(redirect(url_for('auth.login')))
+    resp.delete_cookie('csrf_token')
+    resp.delete_cookie('csrf_refresh_token')
+    resp.delete_cookie('csrf_access_token')
+    resp.delete_cookie('refresh_token_cookie')
+    resp.delete_cookie('access_token_cookie')
+    return resp

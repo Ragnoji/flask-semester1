@@ -1,12 +1,8 @@
-# gevent.monkey should be done as early as possible
-from gevent import monkey
-monkey.patch_all()
-
 import os
 import logging
-from gevent import pywsgi
 from logging.handlers import RotatingFileHandler
-from app import create_app # this imports app
+
+from app import create_app  # this imports app
 
 # create a file handler to store weblogs
 os.makedirs("tmp", exist_ok=True)
@@ -22,6 +18,4 @@ app.logger.setLevel(logging.INFO)
 app.logger.addHandler(handler)
 
 # run the application
-server = pywsgi.WSGIServer(("0.0.0.0", 8080), app)
-app.logger.info("Serving at %s", "http://0.0.0.0:8080")
-server.serve_forever()
+app.run(debug=True)

@@ -1,24 +1,105 @@
-<!doctype html>
-<title>{% block title %}{% endblock %} - flask-psycopg2-starter</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-<nav>
-  <h1>flask-psycopg2-starter</h1>
-  <ul>
-    {% if g.user %}
-      <li><span>{{ g.user['username'] }}</span>
-      <li><a href="{{ url_for('auth.logout') }}">Log Out</a>
-    {% else %}
-      <li><a href="{{ url_for('auth.register') }}">Register</a>
-      <li><a href="{{ url_for('auth.login') }}">Log In</a>
-    {% endif %}
-  </ul>
-</nav>
-<section class="content">
-  <header>
-    {% block header %}{% endblock %}
-  </header>
-  {% for message in get_flashed_messages() %}
-    <div class="flash">{{ message }}</div>
-  {% endfor %}
-  {% block content %}{% endblock %}
-</section>
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="static/css/main.css' %}?">
+</head>
+<body>
+    <div class="auth-wrapper" style="display: none">
+        <div class="auth">
+            <div class="top">
+                <p>Войти</p>
+                <div class="cross" style="background: url('/img/x.svg') no-repeat;" onclick="close_window()"></div>
+            </div>
+            <div class="main">
+                <form action="/" method="post" class="auth-form" style="width: 100%;">{% csrf_token %}
+                    <input name="login" type="text" placeholder="Логин" class="login">
+                    <input name="password" type="password" placeholder="Пароль" class="login" id="last">
+                    <input type="submit" value="Войти" class="to-auth">
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="content">
+        {% include "shop/header.html" %}
+        <nav>
+            <ul>
+                <li class="active"><a href="/">Главная</a></li>
+                {% for category in categories %}
+                {% if category == selected_category %}
+                <li><a href="{{ category.get_absolute_url }}">{{ category }}</a></li>
+                {% else %}
+                <li><a href="{{ category.get_absolute_url }}">{{ category }}</a></li>
+                {% endif %}
+                {% endfor %}
+            </ul>
+        </nav>
+    </div>
+    </header>
+        <div class="grey-body"></div>
+        <div class="container">
+            <article>
+                <div class="offer">
+                    <a href=""><h2>Популярное</h2></a>
+                    <section>
+                        {% for i in popular %}
+                        <a href="{{ i.get_absolute_url }}">
+                            <div class="product">
+                                <div class="wrapper">
+                                    <img src=" {{ i.image.url }}" alt="" class="photo">
+                                    <h3>{{ i.name }}</h3>
+                                    <img src="{% static 'img/star.svg' %}" alt="" class="star">
+                                    <span>{{ i.rating }} ({{ i.rating_count }} оценок)</span>
+                                    <div class="bottom-wrapper">
+                                        <span class="cost">{{ i.price }} б.</span>
+                                        <button class="buy" id="{{ i.id }}">В корзину</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </section>
+                </div>
+                <div class="offer">
+                    <a href=""><h2>Новинки</h2></a>
+                    <section>
+                        {% for i in novelties %}
+                        <a href="{{ i.get_absolute_url }}">
+                            <div class="product">
+                                <div class="wrapper">
+                                    <img src="{{ i.image.url }}" alt="" class="photo">
+                                    <h3>{{ i.name }}</h3>
+                                    <img src="{% static 'img/star.svg' %}" alt="" class="star">
+                                    <span>{{ i.rating }} ({{ i.rating_count }} оценок)</span>
+                                    <div class="bottom-wrapper">
+                                        <span class="cost">{{ i.price }} б.</span>
+                                        <button class="buy" id="{{ i.id }}">В корзину</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </section>
+                </div>
+            </article>
+        </div>
+        <div class="grey-line"></div>
+        <footer>
+            <div class="container">
+                <a href="" class="logo logo-footer">Shop</a>
+                <ul class="nav-footer">
+                    <li><a href="">О магазине</a></li>
+                    <li><a href="">Контакты</a></li>
+                    <li><a href="">Связаться с нами</a></li>
+                </ul>
+            </div>
+        </footer>
+    </div>
+    <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

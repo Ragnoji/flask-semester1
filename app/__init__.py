@@ -1,11 +1,23 @@
 import os
 
+from datetime import datetime
+from datetime import timedelta
+from datetime import timezone
+
 from flask import Flask
+
+from flask_jwt_extended import JWTManager
 
 
 def create_app(test_config=None):
     """Create and configure the app"""
     app = Flask(__name__, instance_relative_config=True)
+
+    ACCESS_EXPIRES = timedelta(hours=12)
+    app.config["JWT_COOKIE_SECURE"] = False
+    app.config["JWT_SECRET_KEY"] = "enj1FMjk#!*@enqenJQEN@$f4@JWV3NJ23Vn@1;.VNVB43UqeWQ@3134J$@$2n$F44C,24"
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = ACCESS_EXPIRES
+    app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 
     # Not actually mapping yet
     app.config.from_mapping(
@@ -25,21 +37,18 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    from . import db
-    db.init_app(app)
+    with app.app_context():
+        from . import db
+        db.init_app(app)
+
+        from . import (auth, views)
+        app.register_blueprint(auth.bp)
+        app.register_blueprint(views.bp)
 
     @app.teardown_request
     def teardown_request(exception):
         if exception:
             app.logger.error(exception)
             db.rollback_db()
-
-    # a simple index page that says hello
-    @app.route('/')
-    def index():
-        return 'Hello, World!'
-
-    from . import auth
-    app.register_blueprint(auth.bp)
 
     return app
