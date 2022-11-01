@@ -1,3 +1,5 @@
+import ImageTools from "./imageResizer";
+
 let buttons = document.querySelectorAll('.buy');
 let logout_button = document.querySelector('.logout');
 let content = document.querySelector('.content');
@@ -25,20 +27,10 @@ logout_button.addEventListener('click', function (event) {
     location.reload();
 });
 
-// function sign_in() {
-//     content.style.filter = 'blur(2px)';
-//     auth_window.style.display = 'flex';
-// }
-//
-// function close_window() {
-//     content.style.filter = '';
-//     auth_window.style.display = 'none';
-// }
-
 function createCookie(name, value, days) {
-    var expires;
+    let expires;
     if (days) {
-        var date = new Date();
+        let date = new Date();
         date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
         expires = "; expires=" + date.toGMTString();
     }
@@ -50,10 +42,10 @@ function createCookie(name, value, days) {
 
 function getCookie(c_name) {
     if (document.cookie.length > 0) {
-        c_start = document.cookie.indexOf(c_name + "=");
+        let c_start = document.cookie.indexOf(c_name + "=");
         if (c_start != -1) {
             c_start = c_start + c_name.length + 1;
-            c_end = document.cookie.indexOf(";", c_start);
+            let c_end = document.cookie.indexOf(";", c_start);
             if (c_end == -1) {
                 c_end = document.cookie.length;
             }

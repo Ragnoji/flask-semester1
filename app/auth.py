@@ -35,6 +35,7 @@ def load_logged_in_user():
         resp.delete_cookie('access_token_cookie')
         return resp
 
+
 @bp.route('/refresh')
 @jwt_required(refresh=True)
 def refresh_expiring_jwts(response):
@@ -125,10 +126,9 @@ def login():
     context = {}
     try:
         verify_jwt_in_request()
-        context['csrf_token'] = get_jwt().get("csrf")
     except NoAuthorizationError:
         pass
-    return render_template('auth/login.html', **context)
+    return render_template('auth/login.html')
 
 
 @jwt.token_in_blocklist_loader
@@ -164,3 +164,11 @@ def logout():
     resp.delete_cookie('refresh_token_cookie')
     resp.delete_cookie('access_token_cookie')
     return resp
+
+
+def admin_required(func):
+    def wrapper(*args, **kwargs):
+        if not g.user or g.user.role != "admin":
+            return redirect(url_for('views.index'), 403)
+        return func(*args, **kwargs)
+    return wrapper

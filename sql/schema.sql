@@ -20,7 +20,9 @@ CREATE TABLE product (
   id SERIAL PRIMARY KEY NOT NULL,
   title varchar(64) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  description TEXT NOT NULL
+  product_img bytea,
+  description TEXT NOT NULL,
+  price decimal(7, 2) NOT NULL
 );
 
 CREATE TABLE usr_fav_products (
@@ -34,7 +36,7 @@ CREATE TABLE usr_fav_products (
 CREATE TABLE "order" (
     id SERIAL PRIMARY KEY NOT NULL,
     user_id INTEGER NOT NULL,
-    cost MONEY NOT NULL,
+    cost decimal(10, 2) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) references usr (id)
 );

@@ -44,34 +44,13 @@
         <div class="container">
             <article>
                 <div class="offer">
-                    <a href=""><h2>Популярное</h2></a>
+                    <a href=""><h2>Каталог</h2></a>
                     <section>
-                        {% for i in popular %}
+                        {% for i in products %}
                         <a href="{{ i.get_absolute_url }}">
                             <div class="product">
                                 <div class="wrapper">
                                     <img src=" {{ i.image.url }}" alt="" class="photo">
-                                    <h3>{{ i.name }}</h3>
-                                    <img src="{% static 'img/star.svg' %}" alt="" class="star">
-                                    <span>{{ i.rating }} ({{ i.rating_count }} оценок)</span>
-                                    <div class="bottom-wrapper">
-                                        <span class="cost">{{ i.price }} б.</span>
-                                        <button class="buy" id="{{ i.id }}">В корзину</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                        {% endfor %}
-                    </section>
-                </div>
-                <div class="offer">
-                    <a href=""><h2>Новинки</h2></a>
-                    <section>
-                        {% for i in novelties %}
-                        <a href="{{ i.get_absolute_url }}">
-                            <div class="product">
-                                <div class="wrapper">
-                                    <img src="{{ i.image.url }}" alt="" class="photo">
                                     <h3>{{ i.name }}</h3>
                                     <img src="{% static 'img/star.svg' %}" alt="" class="star">
                                     <span>{{ i.rating }} ({{ i.rating_count }} оценок)</span>
@@ -100,6 +79,6 @@
         </footer>
     </div>
     <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
-    <script src="{% static 'js/main.js' %}"></script>
+    <script type="module" src="{% static 'js/main.js' %}"></script>
 </body>
 </html>
