@@ -1,22 +1,68 @@
-{% load static %}
 <header>
     <div class="container">
         <div class="upper-block">
-            <a href="/" class="logo">Shop</a>
+            <a href="/" class="logo"><img src="/static/img/favicon.png">Shop</a>
             <form action="" class="search-form">
-                <input type="search" placeholder="Поиск товаров">
+                <input type="search" name="search" {% if search %} value="{{ search }}"{% endif %} placeholder="Поиск товаров">
                 <input type="submit" value="" class="search">
             </form>
-            <button class="help">Помощь</button>
-            <a href="{% url 'cart:cart_detail' %}" class="to-cart"><img src="{% static 'img/cart.svg' %}" class="cart">
+            {% if g.user %}
+            <a href="/wishlist/" class="to-wish">
+                <i class="fa-regular fa-heart" style="font-size: 25px;margin-right:6px"></i>
+                <div class="products-in-wish">
+                    {{ wishlist_size }}
+                </div>
+                <span class="wish-label">Избранное</span>
+            </a>
+            {% endif %}
+            <a href="/cart/" class="to-cart">
+                <img src="{{ url_for('static', filename='img/cart.svg') }}" class="cart">
                 <div class="products-in-cart"
-                     {% if cart == 0 %}
+                     {% if 'cart' not in session.keys() %}
                      style="display: none"
-                     {% endif %}>{{ cart }}</div>
-                Корзина</a>
-            {% if user.username != '' %}
-            <a class="sign-in" href="/logout"><img src="{% static 'img/person.svg' %}" class="person"><div><p>{{ user.get_initials }}</p><span class="balance">Баланс: {{ user.balance }}</span></div></a>
+                     {% endif %}>
+                    {{ session['cart']['qty'] }}
+                </div>
+                {{ session['cart']['cost']|cart_label|safe }}
+            </a>
+            {% if g.user %}
+            <div class="usr_context">
+                <a class="sign-in" onclick="context_menu()">
+                    <img src="{{ url_for('static', filename='img/person.svg') }}" class="person">
+                    <div>
+                        <p>
+                            {% if not g.user.first_name %}
+                            {{ g.user.username }}
+                            {% else %}
+                            {{ g.user.first_name }}
+                            {% endif %}
+                        </p>
+                    </div>
+                </a>
+                <div class="flex-container">
+                    <a class="flex-item" href="/user/">
+                        Профиль
+                    </a>
+                    <a class="flex-item" href="/orders/">
+                        Заказы
+                    </a>
+                    {% if g.user.role == 'admin' %}
+                    <a class="flex-item" href="/admin/">
+                        Админка
+                    </a>
+                    {% endif %}
+                    <a class="flex-item" onclick="sign_out()">
+                        Выйти
+                    </a>
+                </div>
+            </div>
             {% else %}
-            <a class="sign-in" onclick="sign_in()"><img src="{% static 'img/person.svg' %}" class="person">Войти</a>
+            <a class="sign-in" onclick="sign_in()">
+                <img src="{{ url_for('static', filename='img/person.svg') }}" class="person">
+                Войти
+            </a>
+            <a class="sign-in" onclick="sign_up()">
+                Регистрация
+            </a>
             {% endif %}
         </div>

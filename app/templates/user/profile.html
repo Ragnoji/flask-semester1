@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block body %}
+    {% include "auth_modals.html" %}
+    <div class="content">
+        {% include "header.html" %}
+        </div>
+        </header>
+        <div class="profile__block">
+            <form id="profile">
+                <div class="profile__blocks">
+                    <div class="input-row">
+                        <div class="input-row__container">
+                            <input type="text" class="input-row__input" placeholder="" name="first_name" id="first_name" {% if g.user['first_name'] %}value="{{ g.user['first_name'] }}{% endif %}">
+                            <label class="input-row__label" for="first_name">Имя</label>
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-row__container">
+                            <input type="text" class="input-row__input" placeholder="" name="second_name" id="second_name" {% if g.user['second_name'] %}value="{{ g.user['second_name'] }}{% endif %}">
+                            <label class="input-row__label" for="second_name">Фамилия</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-update">
+                    <button type="button"><i class="fa-solid fa-rotate"></i></button>
+                </div>
+            </form>
+        </div>
+        <footer>
+            <div class="container">
+                <a href="" class="logo logo-footer">Shop</a>
+                <ul class="nav-footer">
+                    <li><a href="">О магазине</a></li>
+                    <li><a href="">Контакты</a></li>
+                    <li><a href="">Связаться с нами</a></li>
+                </ul>
+            </div>
+        </footer>
+    </div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+{% endblock %}

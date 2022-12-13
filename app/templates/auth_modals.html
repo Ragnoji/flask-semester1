@@ -1,0 +1,34 @@
+{% if not g.user %}
+    <div class="auth-wrapper fade" id="signinModal" style="display: none">
+        <div class="auth">
+            <div class="top">
+                <p>Войти</p>
+                <div class="cross" style="background: url({{ url_for('static', filename='img/x.svg') }}) no-repeat;" onclick="close_window()"></div>
+            </div>
+            <div class="main">
+                <form id="signin_form" class="auth-form" style="width: 100%;">
+                    <input name="username" type="text" placeholder="Логин" class="login" required>
+                    <input name="password" type="password" placeholder="Пароль" class="login" required>
+                    <ul id="signin_errors" class="auth"></ul>
+                    <input type="submit" value="Войти" class="to-auth">
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="auth-wrapper fade" id="signupModal" style="display: none">
+        <div class="auth">
+            <div class="top">
+                <p>Зарегистрироваться</p>
+                <div class="cross" style="background: url({{ url_for('static', filename='img/x.svg') }}) no-repeat;" onclick="close_window()"></div>
+            </div>
+            <div class="main">
+                <form method="post" id="signup_form" class="auth-form" style="width: 100%;">
+                    <input name="username" type="text" placeholder="Логин" class="login" required>
+                    <input name="password" type="password" placeholder="Пароль" class="login" required>
+                    <ul id="signup_errors" class="auth"></ul>
+                    <input type="submit" value="Войти" class="to-auth">
+                </form>
+            </div>
+        </div>
+    </div>
+{% endif %}

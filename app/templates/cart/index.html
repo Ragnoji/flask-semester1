@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block body %}
+    {% include "auth_modals.html" %}
+    <div class="content">
+        {% include "header.html" %}
+        </div>
+        </header>
+
+        <div class="products-content">
+            <div class="grey-body"></div>
+            <div class="products-container">
+                <h1 class="cart-title">Корзина</h1>
+                <article>
+                    <div class="offer">
+                        <section>
+                        {% if products %}
+                        {% for p in products.items() %}
+                            <div class="product in-cart" id="{{ p[0] }}">
+                                <div class="product-image">
+                                    <img src={% if p[1]['img'] %}"data:image/jpg;base64, {{  p[1]['img'] }}"{% else %}"{{ url_for('static', filename='img/no_img.png') }}"{% endif %} alt="" class="photo">
+                                </div>
+                                <div class="product-main">
+                                    <a class="product-name" href="/product/{{ p[0] }}">
+                                        <span class="product_name">{{ p[1]['name'] }}</span>
+                                    </a>
+                                </div>
+                                <div class="product-remove">
+                                    <a class="product-remove" data-pid="{{ p[0] }}">Удалить</a>
+                                </div>
+                                <div class="product-favorite-buy-cart">
+                                    <div class="price-wrapper">
+                                        <span class="product-price">
+                                        {{ p[1]['price'] }} ₽
+                                        </span>
+                                    </div>
+                                    <div class="change_quantity" style="transition: transform 1s">
+                                        <button class="minus" data-pid="{{ p[0] }}"><i class="fa-solid fa-minus"></i></button>
+                                        <span class="p_quantity" data-pid="{{ p[0] }}">{{ session['cart']['products'][p[0]]['qty'] }}x</span>
+                                        <button class="plus" data-pid="{{ p[0] }}"><i class="fa-regular fa-plus"></i></button>
+                                    </div>
+                                </div>
+                                <div class="product-calculated-cost">
+                                    <span class="product-price">~ {{ p[1]['price'] * session['cart']['products'][p[0]]['qty'] }} ₽</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        {% endif %}
+                        </section>
+                    </div>
+                </article>
+            </div>
+            {% if session['cart']['qty'] == 0 %}
+            <div class="cart-checkout" style="display: none">
+            {% else %}
+            <div class="cart-checkout">
+            {% endif %}
+                <div class="total-amount__summary-section">
+                    <div class="price-summary summary">
+                        <div class="summary-header" style="cursor: default;">
+                            <div class="summary-header__text"><span class="summary-header__total">Итого:</span>
+                                <div class="summary-header__total-items">{{ session['cart']['qty'] }} товар <!--v-if--></div>
+                            </div>
+                            <div class="summary-header__sum">
+                                <div class="price summary__price">
+                                    <div class="price__block price__block_main"><!--v-if--><span class="price__current">{{ session['cart']['cost'] }} ₽</span></div><!--v-if-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="checkout-container">
+                    <button class="checkout{% if not g.user %} unauthorized {% endif %}">Заказать</button>
+                </div>
+            </div>
+        </div>
+        <footer>
+            <div class="container">
+                <a href="" class="logo logo-footer">Shop</a>
+                <ul class="nav-footer">
+                    <li><a href="">О магазине</a></li>
+                    <li><a href="">Контакты</a></li>
+                    <li><a href="">Связаться с нами</a></li>
+                </ul>
+            </div>
+        </footer>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/cart.js') }}"></script>
+{% endblock %}

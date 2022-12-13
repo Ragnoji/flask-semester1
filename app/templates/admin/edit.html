@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block body %}
+    {% include "auth_modals.html" %}
+    <div class="content">
+        {% include "header.html" %}
+        </div>
+        </header>
+<a href="/admin/">
+                <h1 class="title">Админка</h1>
+            </a>
+        <div class="admin-container">
+            <div class="admin-forms">
+                <form class="admin-form" data-product_id="{{ product['id'] }}" id="update-product" action="/admin/update_product">
+                    <h1 class="title">Обновление товара</h1>
+                    <label>
+                        <input {% if product['title'] %} value="{{ product['title'] }}"{% endif %} type="text" name="title">
+                        Название
+                    </label>
+                    <label>
+                        <input {% if product['price'] %} value="{{ product['price'] }}"{% endif %} type="number" name="price">
+                        Цена
+                    </label>
+                    <label>
+                        <textarea {% if product['description'] %} value="{{ product['description'] }}"{% endif %} name="description"></textarea>
+                        Описание
+                    </label>
+                    <label>
+                        <select name="category">
+                            {% if product['category'] %}
+                            <option value="{{ product['category'] }}">{{ categories[product['category']]['name'] }}</option>
+                            {% else %}
+                            <option value="">Пусто</option>
+                            {% endif %}
+                            {% for c in categories %}
+                            <option value="{{ c }}">{{ categories[c]['name'] }}</option>
+                            {% endfor %}
+                        </select>
+                        Категория
+                    </label>
+                    <label>
+                        {% if product['img'] %}<img src="data:image/jpg;base64,{{ product['img'] }}">
+                        {% else %}<img src="/static/img/no_img.png">{% endif %}
+                        <input type="file" name="product_img" accept="image/png, image/jpeg, image/jpg">
+                        Изображение
+                    </label>
+                    <label>
+                        <button type="button" class="button-ui button-ui_brand" data-form-id="update-product">Подтвердить</button>
+                    </label>
+                </form>
+
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}

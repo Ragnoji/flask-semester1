@@ -1,0 +1,13 @@
+{% if features %}
+{% for f in features.items() %}
+    <div class="feature-filter">
+        <span class="feature__label">{{ f[1]['name'] }}</span>
+        <select name="feature_{{ f[0] }}">
+            <option value="">Пусто</option>
+            {% for v in f[1]['values'] %}
+                <option value="{{ v }}">{{ v }}</option>
+            {% endfor %}
+        </select>
+    </div>
+{% endfor %}
+{% endif %}

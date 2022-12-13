@@ -1,0 +1,74 @@
+{% for p in products %}
+<div class="product">
+    <div class="product-image" data-redirect="/product/{{ p['id'] }}">
+        <img src={% if p['img'] %}"data:image/jpg;base64, {{  p['img'] }}"{% else %}"{{ url_for('static', filename='img/no_img.png') }}"{% endif %} class="photo">
+    </div>
+    <a href="/product/{{ p['id'] }}" class="product-name">
+        <span class="product_name">{{ p['name'] }}</span>
+    </a>
+    <div class="product-favorite-buy-cart">
+        <div class="price-wrapper">
+            <div class="product-price">
+            {{ p['price'] }} ₽
+            </div>
+        </div>
+        {% if g.user %}
+            {% if p['favorite'] %}
+            <button class="button-ui button-ui_white button-ui_icon wishlist-btn popover-wrapper button-done" data-product_id="{{  p['id'] }}">
+            {% else %}
+            <button class="button-ui button-ui_white button-ui_icon wishlist-btn popover-wrapper" data-product_id="{{  p['id'] }}">
+            {% endif %}
+                <i class="fa-regular fa-heart"></i>
+            </button>
+        {% endif %}
+        {% if p['id'] not in session.cart['products'].keys() %}
+            <button class="button-ui buy button-ui_brand button-ui_passive" data-product_id="{{ p['id'] }}">В корзину</button>
+        {% else %}
+            <button class="button-ui buy button-ui_brand button-ui_passive button-done" data-product_id="{{ p['id'] }}" data-redirect="/cart/">В корзине</button>
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+<div class="pagination-container">
+<ul class="pagination-widget__pages">
+<li class="pagination-widget__page" data-page-number="0">
+    {% if start < count %}
+    <a href="javascript:" class="pagination-widget__page-link pagination-widget__page-link_first pagination-widget__page-link_disabled"></a>
+    {% else %}
+    <a href="javascript:" class="pagination-widget__page-link pagination-widget__page-link_first"></a>
+    {% endif %}
+</li>
+<li class="pagination-widget__page" data-page-number="{{ (start // count - 1) * count }}">
+    {% if start < count %}
+    <a href="javascript:" class="pagination-widget__page-link pagination-widget__page-link_prev pagination-widget__page-link_disabled"></a>
+    {% else %}
+    <a href="javascript:" class="pagination-widget__page-link pagination-widget__page-link_prev"></a>
+    {% endif %}
+</li>
+
+{% for i in pages %}
+{% if current_page == i // count + 1 %}
+<li class="pagination-widget__page pagination-widget__page_active" data-page-number="{{ i }}">
+{% else %}
+<li class="pagination-widget__page" data-page-number="{{ i }}">
+{% endif %}
+    <a href="javascript:" class="pagination-widget__page-link">{{ i // count + 1 }}</a>
+</li>
+{% endfor %}
+
+<li class="pagination-widget__page" data-page-number="{{ (start // count + 1) * count }}">
+    {% if start >= (total_count - count) %}
+    <a href="javascript:" class="pagination-widget__page-link pagination-widget__page-link_next pagination-widget__page-link_disabled"></a>
+    {% else %}
+    <a href="javascript:" class="pagination-widget__page-link pagination-widget__page-link_next"></a>
+    {% endif %}
+</li>
+<li class="pagination-widget__page" data-page-number="{{ total_count // count * count }}">
+    {% if start >= (total_count - count) %}
+    <a href="javascript:" class="pagination-widget__page-link pagination-widget__page-link_last pagination-widget__page-link_disabled"></a>
+    {% else %}
+    <a href="javascript:" class="pagination-widget__page-link pagination-widget__page-link_last"></a>
+    {% endif %}
+</li>
+</ul>
+</div>

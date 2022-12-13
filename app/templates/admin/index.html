@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% block body %}
+    {% include "auth_modals.html" %}
+    <div class="content">
+        {% include "header.html" %}
+        </div>
+        </header>
+        <div class="admin-container">
+            <div class="admin-forms">
+                <form class="admin-form" id="add-product" action="/admin/add_product">
+                    <h1 class="title">Добавление товара</h1>
+                    <label>
+                        <input type="text" name="title">
+                        Название
+                    </label>
+                    <label>
+                        <input type="number" name="price">
+                        Цена
+                    </label>
+                    <label>
+                        <textarea name="description"></textarea>
+                        Описание
+                    </label>
+                    <label>
+                        <select name="category">
+                            <option value="">Пусто</option>
+                            {% for c in categories %}
+                            <option value="{{ c }}">{{ categories[c]['name'] }}</option>
+                            {% endfor %}
+                        </select>
+                        Категория
+                    </label>
+                    <label>
+                        <input type="file" name="product_img" accept="image/png, image/jpeg, image/jpg">
+                        Изображение
+                    </label>
+                    <label>
+                        <button type="button" class="button-ui button-ui_brand" data-form-id="add-product">Подтвердить</button>
+                    </label>
+                </form>
+                <form class="admin-form" id="add-category" action="/admin/add_category">
+                    <h1 class="title">Добавление категории</h1>
+                    <label>
+                        <input type="text" name="title">
+                        Название
+                    </label>
+                    <label>
+                        <button type="button" class="button-ui button-ui_brand" data-form-id="add-category">Подтвердить</button>
+                    </label>
+                </form>
+                <form class="admin-form" id="add-feature" action="/admin/add_feature">
+                    <h1 class="title">Добавление фичи</h1>
+                    <label>
+                        <input type="text" name="title">
+                        Название
+                    </label>
+                    <label>
+                        <button type="button" class="button-ui button-ui_brand" data-form-id="add-feature">Подтвердить</button>
+                    </label>
+                </form>
+                <form class="admin-form" id="add-feature-value" action="/admin/add_feature_value">
+                    <h1 class="title">Добавление значения фичи</h1>
+                    <label>
+                        <select name="feature">
+                            <option value="">Пусто</option>
+                            {% for f in features %}
+                            <option value="{{ f }}">{{ features[f]['name'] }}</option>
+                            {% endfor %}
+                        </select>
+                        Фича
+                    </label>
+                    <label>
+                        <input name="value" type="text">
+                        Значение
+                    </label>
+                    <label>
+                        <button type="button" class="button-ui button-ui_brand" data-form-id="add-feature-value">Подтвердить</button>
+                    </label>
+                </form>
+                <form class="admin-form" id="bind-feature-value" action="/admin/bind_feature_value">
+                    <h1 class="title">Привязка фичи</h1>
+                    <label>
+                        <select name="product">
+                            <option value="">Пусто</option>
+                            {% for p in products %}
+                            <option value="{{ p }}">{{ products[p]['title'] }}</option>
+                            {% endfor %}
+                        </select>
+                        Товар
+                    </label>
+                    <label>
+                        <select name="feature">
+                            <option value="">Пусто</option>
+                            {% for f in feature_values %}
+                            <option value="{{ f }}">{{ ' '.join([feature_values[f]['name'], feature_values[f]['value']]) }}</option>
+                            {% endfor %}
+                        </select>
+                        Фича
+                    </label>
+                    <label>
+                        <button type="button" class="button-ui button-ui_brand" data-form-id="bind-feature-value">Подтвердить</button>
+                    </label>
+                </form>
+            </div>
+            <div class="admin-tables">
+                <div class="admin-table">
+                    <table class="admin-table">
+                        <h1 class="title">Товары</h1>
+                        <tr>
+                            <th>ID</th>
+                            <th>Img</th>
+                            <th>Title</th>
+                            <th>Price</th>
+                            <th>Category</th>
+                        </tr>
+                        {% for i in products %}
+                        <tr>
+                            <td>{{ i }}</td>
+                            <td>{% if products[i]['img'] %}<img src="data:image/jpg;base64,{{ products[i]['img'] }}">
+                                {% else %}<img src="/static/img/no_img.png">{% endif %}</td>
+                            <td><a href="/admin/edit_product/{{ i }}">{{ products[i]['title'] }}</a></td>
+                            <td>{{ products[i]['price'] }}</td>
+                            <td>{{ products[i]['category_name'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                <div class="admin-table">
+                <table class="admin-table">
+                    <h1 class="title">Категории</h1>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                    </tr>
+                    {% for i in categories %}
+                    <tr>
+                        <td>{{ i }}</td>
+                        <td>{{ categories[i]['name'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                </div>
+                <div class="admin-table">
+                <table class="admin-table">
+                    <h1 class="title">Фичи</h1>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                    </tr>
+                    {% for i in features %}
+                    <tr>
+                        <td>{{ i }}</td>
+                        <td>{{ features[i]['name'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                </div>
+                <div class="admin-table">
+                <table class="admin-table">
+                    <h1 class="title">ФичЗначения</h1>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Value</th>
+                    </tr>
+                    {% for i in feature_values %}
+                    <tr>
+                        <td>{{ i }}</td>
+                        <td>{{ feature_values[i]['name'] }}</td>
+                        <td>{{ feature_values[i]['value'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}

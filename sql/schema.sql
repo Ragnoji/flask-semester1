@@ -6,6 +6,7 @@ DROP TABLE IF EXISTS "category" CASCADE;
 DROP TABLE IF EXISTS category_products;
 DROP TABLE IF EXISTS "feature" CASCADE;
 DROP TABLE IF EXISTS feature_products;
+DROP TABLE IF EXISTS feature_value;
 DROP TABLE IF EXISTS usr_fav_products;
 DROP TABLE IF EXISTS blocked_jwt;
 
@@ -13,15 +14,17 @@ CREATE TABLE usr (
   id SERIAL PRIMARY KEY NOT NULL,
   username TEXT UNIQUE NOT NULL,
   password TEXT NOT NULL,
-  role varchar(20)
+  role varchar(20) NOT NULL DEFAULT 'user',
+  first_name varchar(64),
+  second_name varchar(64)
 );
 
 CREATE TABLE product (
   id SERIAL PRIMARY KEY NOT NULL,
-  title varchar(64) NOT NULL,
+  title varchar(128) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   product_img bytea,
-  description TEXT NOT NULL,
+  description TEXT,
   price decimal(7, 2) NOT NULL
 );
 
@@ -67,16 +70,23 @@ CREATE TABLE category_products (
 CREATE TABLE "feature" (
     id SERIAL PRIMARY KEY NOT NULL,
     name varchar,
-    value varchar,
-    CONSTRAINT uk_01 UNIQUE(name, value)
+    CONSTRAINT f_uk_01 UNIQUE(name)
+);
+
+CREATE TABLE "feature_value" (
+    id SERIAL PRIMARY KEY NOT NULL,
+    feature_id INTEGER not null,
+    value varchar not null,
+    FOREIGN KEY(feature_id) references feature(id),
+    CONSTRAINT fv_uk_01 UNIQUE(feature_id, value)
 );
 
 
 CREATE TABLE feature_products (
     id SERIAL PRIMARY KEY NOT NULL,
-    feature_id INTEGER NOT NULL,
+    feature_value_id INTEGER NOT NULL,
     product_id INTEGER NOT NULL,
-    FOREIGN KEY (feature_id) references feature (id),
+    FOREIGN KEY (feature_value_id) references feature_value (id),
     FOREIGN KEY(product_id) references product(id)
 );
 

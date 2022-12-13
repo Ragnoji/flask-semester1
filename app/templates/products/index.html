@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block body %}
+    {% include "auth_modals.html" %}
+    <div class="content">
+        {% include "header.html" %}
+        <nav>
+            <ul class="categories">
+                {% if not category %}
+                <li class="category active"><a href="/">Главная</a></li>
+                {% else %}
+                <li class="category"><a href="/">Главная</a></li>
+                {% endif %}
+
+                {% for c in categories %}
+                    {% if category == c.get('id') %}
+                    <li class="category active"><a href="/?category={{ c.get('id') }}">{{ c.get('name') }}</a></li>
+                    {% else %}
+                    <li class="category"><a href="/?category={{ c.get('id') }}">{{ c.get('name') }}</a></li>
+                    {% endif %}
+                {% endfor %}
+
+            </ul>
+        </nav>
+        </div>
+        </header>
+
+        <div class="products-title">
+            <h1 class="title">Товаров найдено: {{ total_count }}</h1>
+        </div>
+        <div class="products-content">
+            <div class="left-filters">
+                <div class="feature-filter">
+                        <span class="feature__label">Сортировка</span>
+                        <select name="orderby">
+                            <option value="created_at desc">Новинки</option>
+                            <option value="created_at asc">Старые</option>
+                            <option value="price asc">Дешевле</option>
+                            <option value="price desc">Дороже</option>
+                        </select>
+                    </div>
+                {% include 'products/feature_list.html' %}
+                <button class="button-ui button-ui_brand" id="fetch">Показать</button>
+            </div>
+            <div class="grey-body"></div>
+            <div class="products-container">
+                <article>
+                    <div class="offer">
+                        <section>
+                        {% include 'products/search_results.html' %}
+                        </section>
+                    </div>
+                </article>
+            </div>
+        </div>
+        <footer>
+            <div class="container">
+                <a href="" class="logo logo-footer">Shop</a>
+                <ul class="nav-footer">
+                    <li><a href="">О магазине</a></li>
+                    <li><a href="">Контакты</a></li>
+                    <li><a href="">Связаться с нами</a></li>
+                </ul>
+            </div>
+        </footer>
+    </div>
+{% endblock %}

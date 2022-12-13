@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block body %}
+    {% include "auth_modals.html" %}
+    <div class="content">
+        {% include "header.html" %}
+        </div>
+        </header>
+
+        <div class="orders-content">
+            <div class="grey-body"></div>
+            <div class="orders-container">
+                <h1 class="orders-title">Заказы</h1>
+                <article>
+                    <div class="offer">
+                        <section class="order-list__group">
+                        {% if orders %}
+                        {% for o in orders.items() %}
+                        <div class="page-body">
+                            <div class="order-wrapper">
+                                <div class="order-header order-header_relative-position">
+                                    <div class="order-header__body">
+                                        <div class="order-header__info-block">
+                                            <div class="order-header__name-and-date">
+                                                <p><span class="order-header__order-name">Заказ №{{ o[0] }}</span><span class="order-header__order-date">от {{ o[1]['date'] }}</span></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="order-body">
+                                    <div class="order-body__conditions-and-total">
+                                        <div class="order-summary">
+                                            <p class="order-summary__sum-line">Итого: <span class="order-summary__sum">{{ o[1]['cost'] }} ₽</span></p>
+                                        </div>
+                                    </div>
+                                    {% for p in o[1]['products'].items() %}
+                                    <div class="order-product__wrapper">
+                                        <div class="order-product order-product_order">
+                                            <div class="order-product__image-block"><img alt="" class="order-product__image" src={% if p[1]['img'] %}"data:image/jpg;base64, {{  p[1]['img'] }}"{% else %}"{{ url_for('static', filename='img/no_img.png') }}"{% endif %}></div>
+                                            <div class="order-product__description"><a class="order-product__name" href="/product/{{ p[0] }}">{{ p[1]['title'] }}</a>
+                                                <div class="order-product__code-block"><span class="order-product__code-label">Код товара: </span><span class="order-product__code">#{{ p[0] }}</span></div>
+                                            </div>
+                                            <div class="order-price-block">
+                                                <div class="order-price-block__line"><span>Цена:</span><span class="order-price-block__value order-price-block__value_big">{{ p[1]['price'] }} ₽</span></div>
+                                                <div class="order-price-block__line order-price-block__sub-info">{{ p[1]['qty'] }} шт. x {{ p[1]['price'] }} ₽</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                        </section>
+                    </div>
+                </article>
+            </div>
+        </div>
+        <footer>
+            <div class="container">
+                <a href="" class="logo logo-footer">Shop</a>
+                <ul class="nav-footer">
+                    <li><a href="">О магазине</a></li>
+                    <li><a href="">Контакты</a></li>
+                    <li><a href="">Связаться с нами</a></li>
+                </ul>
+            </div>
+        </footer>
+    </div>
+{% endblock %}

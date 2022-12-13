@@ -1,48 +1,75 @@
-let plus = document.querySelectorAll('.plus');
-let minus = document.querySelectorAll('.minus');
-
-plus.forEach(button => {
-    button.addEventListener('click', function (event) {
-        event.preventDefault();
-        let id = this.name
-        $.ajax({
-            headers: { "X-CSRFToken": token },
-            url: '/cart/change_quantity',
-            method: 'post',
-            data: {
-                id: this.name,
-                action: '+'},
-            success: function (data) {
-                let count = document.getElementById(id);
-                let count_cart = $('.products-in-cart')[0];
-                count.innerText = data.count;
-                count_cart.innerText = parseInt(count_cart.innerText) + 1;
+$('.plus').on('click', function (event) {
+    let id = this.getAttribute('data-pid');
+    $.ajax({
+        headers: { "X-CSRF-Token": getCookie("csrf_access_token") },
+        url: '/cart/change_quantity',
+        method: 'post',
+        data: JSON.stringify({
+            id: parseInt(id, 10),
+            action: "+"
+        }),
+        contentType: "application/json",
+        success: function (data) {
+            if(data.success === 1){
+                $(`#${id} .p_quantity`).text(data['p_qty'] + 'x');
+                $(`#${id} .product-calculated-cost > span`).text(`~ ${data['p_cost'].toFixed(2)} ₽`);
+                $('.cart-label.cart-cost').text(data['cost']);
+                $('.products-in-cart').text(data['qty']);
             }
-        });
+        }
     });
 });
 
-minus.forEach(button => {
-    button.addEventListener('click', function (event) {
-        event.preventDefault();
-        let id = this.name
-        let count = document.getElementById(id);
-        if (count.innerText === '0') {
-            return
-        }
-        $.ajax({
-            headers: { "X-CSRFToken": token },
-            url: '/cart/change_quantity',
-            method: 'post',
-            data: {
-                id: this.name,
-                action: '-'},
-            success: function (data) {
-                let count = document.getElementById(id);
-                let count_cart = $('.products-in-cart')[0];
-                count.innerText = data.count;
-                count_cart.innerText = parseInt(count_cart.innerText) - 1;
+$('.minus').on('click', function (event) {
+    let id = this.getAttribute('data-pid');
+    $.ajax({
+        headers: { "X-CSRF-Token": getCookie("csrf_access_token") },
+        url: '/cart/change_quantity',
+        method: 'post',
+        data: JSON.stringify({
+            id: parseInt(id, 10),
+            action: "-"
+        }),
+        contentType: "application/json",
+        success: function (data) {
+            if(data.success === 1){
+                $(`#${id} .p_quantity`).text(data['p_qty'] + 'x');
+                $(`#${id} .product-calculated-cost > span`).text(`~ ${data['p_cost'].toFixed(2)} ₽`);
+                $('.cart-label.cart-cost').text(data['cost']);
+                $('.products-in-cart').text(data['qty']);
+            } else if(data.success === 2) {
+                $(`#${id}`).remove()
+                if(data['qty'] !== 0) {
+                    $('.cart-label.cart-cost').text(data['cost']);
+                } else {
+                    $('.cart-label.cart-cost').removeClass('cart-cost');
+                    $('.cart-label').text('Корзина');
+                    $('.cart-checkout').css('display', 'none');
+                }
+                $('.products-in-cart').text(data['qty']);
             }
-        });
+        }
+    });
+});
+
+$('button.checkout').on('click', function() {
+   if(this.classList.contains('unauthorized')) {
+       alert('Авторизуйтесь для создания заказа');
+       sign_in();
+   }
+   $.ajax({
+        headers: { "X-CSRF-Token": getCookie("csrf_access_token") },
+        url: '/cart/checkout',
+        method: 'post',
+        contentType: "application/json",
+        success: function (data) {
+            if(data.success === 1) {
+                window.location.replace('/');
+                alert('Заказ успешно создан');
+            } else {
+                alert('Ошибка при создании заказа');
+                window.location.reload();
+            }
+        }
     });
 });
